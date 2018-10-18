@@ -51,6 +51,7 @@ void FaceTracker::GetLandmark(float * buf, int size)
 			buf[j] = m_Fits[0][x].x;
 			buf[j + 1] = m_Fits[0][x].y;
 		}
+		imshow("F", m_Image);
 	}
 }
 

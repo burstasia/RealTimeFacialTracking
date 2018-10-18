@@ -22,7 +22,8 @@ void ATestActorCode::BeginPlay()
 {
 	Super::BeginPlay();
 	
-	ImportDLL}
+	//m_pSkeletalMesh->GetMorphTarget(FName{""})
+}
 
 // Called every frame
 void ATestActorCode::Tick(float DeltaTime)

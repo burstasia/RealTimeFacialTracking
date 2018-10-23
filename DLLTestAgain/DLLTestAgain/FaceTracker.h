@@ -26,5 +26,7 @@ private:
 
 	std::vector<cv::Rect> m_Faces;
 	std::vector<std::vector<cv::Point2f>> m_Fits;
+
+	float m_Threshold;
 };
 

@@ -29,14 +29,14 @@ FaceTracker::FaceTracker()
 	//this threshold will determine if a point on the facial landmark should move
 	m_Threshold = 0.1f;
 
-	if (m_Cap.isOpened())
+	/*if (m_Cap.isOpened())
 	{
 		m_Cap.read(m_Image);
 
 		m_Cascade.detectMultiScale(m_Image, m_Faces);
 
 		bool ok = m_Facemark->fit(m_Image, m_Faces, m_Fits);
-	}
+	}*/
 }
 
 
@@ -57,27 +57,27 @@ void FaceTracker::GetLandmark(float * buf, int size)
 
 		m_Cascade.detectMultiScale(m_Image, m_Faces);
 
-		vector<vector<Point2f>> newFits;
+		//vector<vector<Point2f>> newFits;
 
-		bool ok = m_Facemark->fit(m_Image, m_Faces, newFits);
+		bool ok = m_Facemark->fit(m_Image, m_Faces, m_Fits);
 
 		//TODO: fix magic numbers
 		for (int j = 0, x = 0; j < 136; j +=2, x++ )
 		{
-			if (newFits[0][x].x - m_Fits[0][x].x > m_Threshold)
+			/*if (newFits[0][x].x - m_Fits[0][x].x > m_Threshold)
 			{
 				m_Fits[0][x].x = newFits[0][x].x;
 			}
 			if (newFits[0][x].y - m_Fits[0][x].y > m_Threshold)
 			{
 				m_Fits[0][x].y = newFits[0][x].y;
-			}
+			}*/
 			buf[j] = m_Fits[0][x].x;
 			buf[j + 1] = m_Fits[0][x].y;
 			circle(m_Image, m_Fits[0][x], 1, { 1.0f,0.0f,0.0f });
 		}
 
-		m_Fits = newFits;
+		//m_Fits = newFits;
 		imshow("F", m_Image);
 	}
 }

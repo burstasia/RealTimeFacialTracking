@@ -5,6 +5,29 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "FaceAnimations.generated.h"
+USTRUCT()
+struct FFacialFeatureInfo
+{
+	GENERATED_BODY()
+		UPROPERTY()
+			float maxDistance;
+		UPROPERTY()
+			FVector2D neutralPos;
+		UPROPERTY()
+			bool isY;
+		UPROPERTY()
+			FName morphTargetName;
+		UPROPERTY()
+			int indexFeature;
+
+		FFacialFeatureInfo() :
+			maxDistance(0.0f),
+			neutralPos(FVector2D{ 0.0f,0.0f }),
+			isY(true),
+			morphTargetName({""}),
+			indexFeature()
+		{}
+};
 
 UCLASS()
 class LINKDLLPROJ_API AFaceAnimations : public AActor
@@ -40,4 +63,8 @@ public:
 		TArray<FVector2D> m_AngryFacePoints;
 	UPROPERTY()
 		TArray<FVector2D> m_SurprisedFacePoints;
+
+	UPROPERTY()
+		TArray<FFacialFeatureInfo> m_FacialFeatureArray;
+
 };

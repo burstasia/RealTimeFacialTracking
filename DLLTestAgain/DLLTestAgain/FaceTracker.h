@@ -18,7 +18,7 @@ public:
 private:
 	
 	cv::VideoCapture m_Cap{ 0 };
-	cv::Mat m_Image{};
+	cv::UMat m_Image{};
 
 	cv::Ptr<cv::face::Facemark> m_Facemark;
 

@@ -45,4 +45,15 @@ void AFaceAnimations::GetSurprisedFace(const TArray<FVector2D>& trackedSurprised
 	m_SurprisedFacePoints = trackedSurprised;
 }
 
+void AFaceAnimations::SetMinMax()
+{
+
+
+}
+
+void AFaceAnimations::SetFacialExpression(const TArray<FVector2D>& currentTrackedPoints)
+{
+
+
+}
 

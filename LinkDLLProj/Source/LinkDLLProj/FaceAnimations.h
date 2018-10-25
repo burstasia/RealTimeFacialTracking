@@ -27,7 +27,11 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Calibration") void GetSmileFace(const TArray<FVector2D>& trackedSmile);
 	UFUNCTION(BlueprintCallable, Category = "Calibration") void GetAngryFace(const TArray<FVector2D>& trackedAngry);
 	UFUNCTION(BlueprintCallable, Category = "Calibration") void GetSurprisedFace(const TArray<FVector2D>& trackedSurprised);
-	
+
+	UFUNCTION(BlueprintCallable, Category = "Calibration") void SetMinMax();
+
+	UFUNCTION(BlueprintCallable, Category = "Expression") void SetFacialExpression(const TArray<FVector2D>& currentTrackedPoints);
+
 	UPROPERTY()
 		TArray<FVector2D> m_NeutralFacePoints;
 	UPROPERTY()

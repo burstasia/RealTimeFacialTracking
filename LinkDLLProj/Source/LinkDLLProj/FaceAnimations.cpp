@@ -15,6 +15,9 @@ AFaceAnimations::AFaceAnimations()
 void AFaceAnimations::BeginPlay()
 {
 	Super::BeginPlay();
+
+	m_FacialFeatureArray.Push(FFacialFeatureInfo{ "smileRight", 55, ExpressionEnum::Happy });
+
 	
 }
 
@@ -47,7 +50,29 @@ void AFaceAnimations::GetSurprisedFace(const TArray<FVector2D>& trackedSurprised
 
 void AFaceAnimations::SetMinMax()
 {
+	FVector2D neutralTranslation{}; //28
 
+	for (int i = 0; i < m_FacialFeatureArray.Num(); i++)
+	{
+		FFacialFeatureInfo info = m_FacialFeatureArray[i];
+
+		switch (info.expression)
+		{
+		case ExpressionEnum::Angry:
+			//set neutral pos
+			//set max distance - adjust current pos of index with neutralTranslation
+			info.neutralPos = m_NeutralFacePoints[28];
+			neutralTranslation = Size(m_NeutralFacePoints[info.indexFeature] - m_AngryFacePoints[info.indexFeature]);
+			info.maxDistance = 
+			break;
+
+		case ExpressionEnum::Happy:
+			break;
+
+		case ExpressionEnum::Surprised:
+			break;
+		}
+	}
 
 }
 

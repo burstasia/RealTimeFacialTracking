@@ -5,6 +5,15 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "FaceAnimations.generated.h"
+UENUM()
+
+enum ExpressionEnum
+{
+	Surprised = 0,
+	Angry = 1,
+	Happy = 2
+};
+
 USTRUCT()
 struct FFacialFeatureInfo
 {
@@ -19,15 +28,20 @@ struct FFacialFeatureInfo
 			FName morphTargetName;
 		UPROPERTY()
 			int indexFeature;
+		UPROPERTY()
+			ExpressionEnum expression;
 
-		FFacialFeatureInfo() :
+		FFacialFeatureInfo(const FName& morphName, int indexFeature, ExpressionEnum expressionFeature) :
 			maxDistance(0.0f),
 			neutralPos(FVector2D{ 0.0f,0.0f }),
 			isY(true),
-			morphTargetName({""}),
-			indexFeature()
+			morphTargetName(morphName),
+			indexFeature(indexFeature),
+			expression(expressionFeature)
 		{}
 };
+
+
 
 UCLASS()
 class LINKDLLPROJ_API AFaceAnimations : public AActor

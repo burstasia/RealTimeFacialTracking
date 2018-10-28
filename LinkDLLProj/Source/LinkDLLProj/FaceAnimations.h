@@ -87,8 +87,14 @@ public:
 
 	UPROPERTY()
 		TArray<FFacialFeatureInfo> m_FacialFeatureArray;
+	UPROPERTY()
+		TArray<FVector2D> m_LastFramePoints;
+
 
 	UPROPERTY()
+		USceneComponent* m_pRoot;
+
+	UPROPERTY(EditAnywhere)
 		USkeletalMeshComponent* m_pSkeleton;
 
 	int m_IndexMiddleFace{ 28 };
@@ -98,6 +104,8 @@ public:
 	int m_RightTemple{17};
 	float m_DistanceBetweenTemples{};
 
+	float m_ThresholdMin{ 1.0f };
+	float m_ThresholdMax{ 2.0f };
 private:
 	void MaxDistanceHelper(const TArray<FVector2D>& expressionPoints, FFacialFeatureInfo& info);
 

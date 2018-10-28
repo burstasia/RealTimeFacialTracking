@@ -10,6 +10,11 @@ AFaceAnimations::AFaceAnimations()
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
+	m_pRoot = CreateDefaultSubobject<USceneComponent>(TEXT("Root"));
+	RootComponent = m_pRoot;
+
+	m_pSkeleton = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("SkeletalMesh"));
+	m_pSkeleton->AttachTo(m_pRoot);
 }
 
 // Called when the game starts or when spawned
@@ -17,8 +22,9 @@ void AFaceAnimations::BeginPlay()
 {
 	Super::BeginPlay();
 
-	m_FacialFeatureArray.Push(FFacialFeatureInfo{ "smileRight", 55, EExpressionEnum::Happy });
+	m_FacialFeatureArray.Push(FFacialFeatureInfo{ "mouthSmileRight", 55, EExpressionEnum::Happy });
 
+	
 	
 }
 
@@ -47,6 +53,8 @@ void AFaceAnimations::SetAngryFace(const TArray<FVector2D>& trackedAngry)
 void AFaceAnimations::SetSurprisedFace(const TArray<FVector2D>& trackedSurprised)
 {
 	m_SurprisedFacePoints = trackedSurprised;
+	m_LastFramePoints = trackedSurprised;
+
 }
 
 void AFaceAnimations::SetMinMax()
@@ -101,13 +109,30 @@ void AFaceAnimations::SetFacialExpression(const TArray<FVector2D>& currentTracke
 		//x or Y
 		if (info.isY)
 		{
-			float value = distance.Y / scaledMaxDistance;
+			if (currentTrackedPoints[i].Y - m_LastFramePoints[i].Y > m_ThresholdMin && currentTrackedPoints[i].Y - m_LastFramePoints[i].Y < m_ThresholdMax)
+			{
+				float value = distance.Y / scaledMaxDistance;
 
-			value = FMath::Abs(value);
+				value = FMath::Abs(value);
 
-			FMath::Clamp(value, 0.0f, 1.0f);
+				value = FMath::Clamp(value, 0.0f, 1.0f);
 
-			m_pSkeleton->SetMorphTarget(info.morphTargetName, value);
+				m_pSkeleton->SetMorphTarget(info.morphTargetName, value);
+			}
+			
+			else
+			{
+				distance = m_LastFramePoints[info.indexFeature] - info.neutralPos;
+
+				float value = distance.Y / scaledMaxDistance;
+
+				value = FMath::Abs(value);
+
+				value = FMath::Clamp(value, 0.0f, 1.0f);
+
+				m_pSkeleton->SetMorphTarget(info.morphTargetName, value);
+
+			}
 		}
 		//compare it to the max distance
 
@@ -119,6 +144,8 @@ void AFaceAnimations::SetFacialExpression(const TArray<FVector2D>& currentTracke
 		//this way we aviod jittering and extreme movement because the face tracker bugs out occasionally
 		//set the morphTaget
 	}
+
+	m_LastFramePoints = currentTrackedPoints;
 }
 
 void AFaceAnimations::MaxDistanceHelper(const TArray<FVector2D>& expressionPoints, FFacialFeatureInfo & info)

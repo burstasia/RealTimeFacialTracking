@@ -5,14 +5,18 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "FaceAnimations.generated.h"
-UENUM()
 
-enum ExpressionEnum
+UENUM()
+namespace EExpressionEnum
 {
-	Surprised = 0,
-	Angry = 1,
-	Happy = 2
-};
+	enum ExpressionTypes
+	{
+		Surprised = 0,
+		Angry = 1,
+		Happy = 2
+	};
+}
+
 
 USTRUCT()
 struct FFacialFeatureInfo
@@ -29,9 +33,11 @@ struct FFacialFeatureInfo
 		UPROPERTY()
 			int indexFeature;
 		UPROPERTY()
-			ExpressionEnum expression;
+			TEnumAsByte<EExpressionEnum::ExpressionTypes> expression;
 
-		FFacialFeatureInfo(const FName& morphName, int indexFeature, ExpressionEnum expressionFeature) :
+		FFacialFeatureInfo()
+		{}
+		FFacialFeatureInfo(const FName& morphName, int indexFeature, TEnumAsByte<EExpressionEnum::ExpressionTypes> expressionFeature) :
 			maxDistance(0.0f),
 			neutralPos(FVector2D{ 0.0f,0.0f }),
 			isY(true),
@@ -80,5 +86,7 @@ public:
 
 	UPROPERTY()
 		TArray<FFacialFeatureInfo> m_FacialFeatureArray;
+
+	int m_IndexMiddleFace{ 28 };
 
 };

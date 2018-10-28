@@ -50,8 +50,6 @@ void AFaceAnimations::GetSurprisedFace(const TArray<FVector2D>& trackedSurprised
 
 void AFaceAnimations::SetMinMax()
 {
-	FVector2D neutralTranslation{}; //28
-	FVector2D distance{};
 	for (int i = 0; i < m_FacialFeatureArray.Num(); i++)
 	{
 		FFacialFeatureInfo info = m_FacialFeatureArray[i];
@@ -59,30 +57,19 @@ void AFaceAnimations::SetMinMax()
 		switch (info.expression)
 		{
 		case EExpressionEnum::Angry:
-			//set neutral pos
-			//set max distance - adjust current pos of index with neutralTranslation
-			neutralTranslation = m_NeutralFacePoints[m_IndexMiddleFace] - m_AngryFacePoints[m_IndexMiddleFace]; //get the vector representing the distance between the eyebrows 
-			info.neutralPos = m_NeutralFacePoints[info.indexFeature] + neutralTranslation;
-
-			distance = info.neutralPos - m_AngryFacePoints[info.indexFeature];
-
-			if (info.isY)
-			{
-				info.maxDistance = distance.Y;
-			}
-			else
-			{
-				info.maxDistance = distance.X;
-			}
-			//info.maxDistance = 
+			MaxDistanceHelper(m_AngryFacePoints, info);
 			break;
 
 		case EExpressionEnum::Happy:
+			MaxDistanceHelper(m_SmileFacePoints, info);
 			break;
 
 		case EExpressionEnum::Surprised:
+			MaxDistanceHelper(m_SurprisedFacePoints, info);
 			break;
 		}
+
+		m_FacialFeatureArray[i] = info;
 	}
 
 }
@@ -91,5 +78,25 @@ void AFaceAnimations::SetFacialExpression(const TArray<FVector2D>& currentTracke
 {
 
 
+}
+
+void AFaceAnimations::MaxDistanceHelper(const TArray<FVector2D>& expressionPoints, FFacialFeatureInfo & info)
+{
+	FVector2D neutralTranslation{}; 
+	FVector2D distance{};
+
+	neutralTranslation = m_NeutralFacePoints[m_IndexMiddleFace] - expressionPoints[m_IndexMiddleFace]; //get the vector representing the distance between the eyebrows 
+	info.neutralPos = m_NeutralFacePoints[info.indexFeature] + neutralTranslation;
+
+	distance = info.neutralPos - expressionPoints[info.indexFeature];
+
+	if (info.isY)
+	{
+		info.maxDistance = distance.Y;
+	}
+	else
+	{
+		info.maxDistance = distance.X;
+	}
 }
 

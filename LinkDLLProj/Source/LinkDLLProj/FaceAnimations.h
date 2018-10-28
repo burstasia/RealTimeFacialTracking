@@ -89,4 +89,8 @@ public:
 
 	int m_IndexMiddleFace{ 28 };
 
+private:
+	void MaxDistanceHelper(const TArray<FVector2D>& expressionPoints, FFacialFeatureInfo& info);
+
+
 };

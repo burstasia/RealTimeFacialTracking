@@ -13,7 +13,6 @@ public:
 	~FaceTracker();
 
 	void Init();
-	//float GetLandmark(int index, bool isX);
 	void GetLandmark(float * buf, int size);
 private:
 	
@@ -27,6 +26,5 @@ private:
 	std::vector<cv::Rect> m_Faces;
 	std::vector<std::vector<cv::Point2f>> m_Fits;
 
-	float m_Threshold;
 };
 

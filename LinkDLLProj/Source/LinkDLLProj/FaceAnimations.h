@@ -6,6 +6,7 @@
 #include "GameFramework/Actor.h"
 #include "FaceAnimations.generated.h"
 
+
 UENUM()
 namespace EExpressionEnum
 {
@@ -66,10 +67,10 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
-	UFUNCTION(BlueprintCallable, Category = "Calibration") void GetNeutralFace(const TArray<FVector2D>& trackedNeutral);
-	UFUNCTION(BlueprintCallable, Category = "Calibration") void GetSmileFace(const TArray<FVector2D>& trackedSmile);
-	UFUNCTION(BlueprintCallable, Category = "Calibration") void GetAngryFace(const TArray<FVector2D>& trackedAngry);
-	UFUNCTION(BlueprintCallable, Category = "Calibration") void GetSurprisedFace(const TArray<FVector2D>& trackedSurprised);
+	UFUNCTION(BlueprintCallable, Category = "Calibration") void SetNeutralFace(const TArray<FVector2D>& trackedNeutral);
+	UFUNCTION(BlueprintCallable, Category = "Calibration") void SetSmileFace(const TArray<FVector2D>& trackedSmile);
+	UFUNCTION(BlueprintCallable, Category = "Calibration") void SetAngryFace(const TArray<FVector2D>& trackedAngry);
+	UFUNCTION(BlueprintCallable, Category = "Calibration") void SetSurprisedFace(const TArray<FVector2D>& trackedSurprised);
 
 	UFUNCTION(BlueprintCallable, Category = "Calibration") void SetMinMax();
 
@@ -87,7 +88,15 @@ public:
 	UPROPERTY()
 		TArray<FFacialFeatureInfo> m_FacialFeatureArray;
 
+	UPROPERTY()
+		USkeletalMeshComponent* m_pSkeleton;
+
 	int m_IndexMiddleFace{ 28 };
+
+	//might've gotten these confused
+	int m_LeftTemple{1};
+	int m_RightTemple{17};
+	float m_DistanceBetweenTemples{};
 
 private:
 	void MaxDistanceHelper(const TArray<FVector2D>& expressionPoints, FFacialFeatureInfo& info);

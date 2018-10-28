@@ -1,7 +1,8 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #include "FaceAnimations.h"
-
+#include "components/SkeletalMeshComponent.h"
+//#include "Runtime/Core/Public/GenericPlatform/GenericPlatformMath.h"
 
 // Sets default values
 AFaceAnimations::AFaceAnimations()
@@ -28,28 +29,30 @@ void AFaceAnimations::Tick(float DeltaTime)
 
 }
 
-void AFaceAnimations::GetNeutralFace(const TArray<FVector2D>& trackedNeutral)
+void AFaceAnimations::SetNeutralFace(const TArray<FVector2D>& trackedNeutral)
 {
 	m_NeutralFacePoints = trackedNeutral;
 }
 
-void AFaceAnimations::GetSmileFace(const TArray<FVector2D>& trackedSmile)
+void AFaceAnimations::SetSmileFace(const TArray<FVector2D>& trackedSmile)
 {
 	m_SmileFacePoints = trackedSmile;
 }
 
-void AFaceAnimations::GetAngryFace(const TArray<FVector2D>& trackedAngry)
+void AFaceAnimations::SetAngryFace(const TArray<FVector2D>& trackedAngry)
 {
 	m_AngryFacePoints = trackedAngry;
 }
 
-void AFaceAnimations::GetSurprisedFace(const TArray<FVector2D>& trackedSurprised)
+void AFaceAnimations::SetSurprisedFace(const TArray<FVector2D>& trackedSurprised)
 {
 	m_SurprisedFacePoints = trackedSurprised;
 }
 
 void AFaceAnimations::SetMinMax()
 {
+	m_DistanceBetweenTemples = m_NeutralFacePoints[m_RightTemple].X - m_NeutralFacePoints[m_LeftTemple].X;
+
 	for (int i = 0; i < m_FacialFeatureArray.Num(); i++)
 	{
 		FFacialFeatureInfo info = m_FacialFeatureArray[i];
@@ -76,8 +79,46 @@ void AFaceAnimations::SetMinMax()
 
 void AFaceAnimations::SetFacialExpression(const TArray<FVector2D>& currentTrackedPoints)
 {
+	FVector2D neutralTranslation{};
+	neutralTranslation = currentTrackedPoints[m_IndexMiddleFace] - m_NeutralFacePoints[m_IndexMiddleFace];
 
+	//adjusting for person moving closer/further from the camera
+	float currDistanceBetweenTemples = currentTrackedPoints[m_RightTemple].X - currentTrackedPoints[m_LeftTemple].X;
+	float percentageDifference = (currDistanceBetweenTemples / m_DistanceBetweenTemples) - 1.0f;
 
+	for (int i = 0; i < m_FacialFeatureArray.Num(); i++)
+	{
+		FFacialFeatureInfo info = m_FacialFeatureArray[i];
+
+		//adjust the neutral point to the current position of the head
+		info.neutralPos = m_NeutralFacePoints[info.indexFeature] + neutralTranslation;
+
+		//calculate this distance
+		FVector2D distance = currentTrackedPoints[info.indexFeature] - info.neutralPos;
+
+		//only compare current distance between features if maxDistance has been adjusted
+		float scaledMaxDistance = (info.maxDistance * percentageDifference) + info.maxDistance;
+		//x or Y
+		if (info.isY)
+		{
+			float value = distance.Y / scaledMaxDistance;
+
+			value = FMath::Abs(value);
+
+			FMath::Clamp(value, 0.0f, 1.0f);
+
+			m_pSkeleton->SetMorphTarget(info.morphTargetName, value);
+		}
+		//compare it to the max distance
+
+		//if the distance last frame compared to the distance this frame is lower than a certain threshold 
+		//then we don't change the morph target
+
+		//also if the distance is bigger than a certain threshold then we don't change it either
+
+		//this way we aviod jittering and extreme movement because the face tracker bugs out occasionally
+		//set the morphTaget
+	}
 }
 
 void AFaceAnimations::MaxDistanceHelper(const TArray<FVector2D>& expressionPoints, FFacialFeatureInfo & info)
@@ -85,10 +126,10 @@ void AFaceAnimations::MaxDistanceHelper(const TArray<FVector2D>& expressionPoint
 	FVector2D neutralTranslation{}; 
 	FVector2D distance{};
 
-	neutralTranslation = m_NeutralFacePoints[m_IndexMiddleFace] - expressionPoints[m_IndexMiddleFace]; //get the vector representing the distance between the eyebrows 
+	neutralTranslation = expressionPoints[m_IndexMiddleFace] - m_NeutralFacePoints[m_IndexMiddleFace]; //get the vector representing the distance between the eyebrows 
 	info.neutralPos = m_NeutralFacePoints[info.indexFeature] + neutralTranslation;
 
-	distance = info.neutralPos - expressionPoints[info.indexFeature];
+	distance = expressionPoints[info.indexFeature] - info.neutralPos;
 
 	if (info.isY)
 	{

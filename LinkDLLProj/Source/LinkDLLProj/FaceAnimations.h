@@ -14,7 +14,8 @@ namespace EExpressionEnum
 	{
 		Surprised = 0,
 		Angry = 1,
-		Happy = 2
+		Happy = 2,
+		Closed = 3
 	};
 }
 
@@ -71,6 +72,7 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Calibration") void SetSmileFace(const TArray<FVector2D>& trackedSmile);
 	UFUNCTION(BlueprintCallable, Category = "Calibration") void SetAngryFace(const TArray<FVector2D>& trackedAngry);
 	UFUNCTION(BlueprintCallable, Category = "Calibration") void SetSurprisedFace(const TArray<FVector2D>& trackedSurprised);
+	UFUNCTION(BlueprintCallable, Category = "Calibration") void SetClosedEyes(const TArray<FVector2D>& trackedClosed);
 
 	UFUNCTION(BlueprintCallable, Category = "Calibration") void SetMinMax();
 
@@ -84,6 +86,8 @@ public:
 		TArray<FVector2D> m_AngryFacePoints;
 	UPROPERTY()
 		TArray<FVector2D> m_SurprisedFacePoints;
+	UPROPERTY()
+		TArray<FVector2D> m_ClosedFacePoints;
 
 	UPROPERTY()
 		TArray<FFacialFeatureInfo> m_FacialFeatureArray;
@@ -104,7 +108,7 @@ public:
 	int m_RightTemple{16};
 	float m_DistanceBetweenTemples{};
 
-	float m_ThresholdMin{ 1.0f };
+	float m_ThresholdMin{ 1.8f };
 	float m_ThresholdMax{ 2.0f };
 private:
 	void MaxDistanceHelper(const TArray<FVector2D>& expressionPoints, FFacialFeatureInfo& info);

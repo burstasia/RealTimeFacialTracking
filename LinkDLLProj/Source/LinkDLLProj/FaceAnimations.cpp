@@ -24,7 +24,9 @@ void AFaceAnimations::BeginPlay()
 
 	m_FacialFeatureArray.Push(FFacialFeatureInfo{ "Smile_Lips_Opened_R_", 54, EExpressionEnum::Happy });
 	m_FacialFeatureArray.Push(FFacialFeatureInfo{ "Smile_Lips_Opened_L_", 48, EExpressionEnum::Happy });
-	m_FacialFeatureArray.Push(FFacialFeatureInfo{ "Mouth_Wide_Opened", 8, EExpressionEnum::Surprised });
+	m_FacialFeatureArray.Push(FFacialFeatureInfo{ "Mouth_Little_Opened", 8, EExpressionEnum::Surprised });
+	m_FacialFeatureArray.Push(FFacialFeatureInfo{ "Eye_Closed_L", 37, EExpressionEnum::Closed });
+	m_FacialFeatureArray.Push(FFacialFeatureInfo{ "Eye_Closed_R", 44, EExpressionEnum::Closed });
 	
 }
 
@@ -57,6 +59,11 @@ void AFaceAnimations::SetSurprisedFace(const TArray<FVector2D>& trackedSurprised
 
 }
 
+void AFaceAnimations::SetClosedEyes(const TArray<FVector2D>& trackedClosed)
+{
+	m_ClosedFacePoints = trackedClosed;
+	m_LastFramePoints = trackedClosed;
+}
 void AFaceAnimations::SetMinMax()
 {
 	m_DistanceBetweenTemples = m_NeutralFacePoints[m_RightTemple].X - m_NeutralFacePoints[m_LeftTemple].X;
@@ -77,6 +84,10 @@ void AFaceAnimations::SetMinMax()
 
 		case EExpressionEnum::Surprised:
 			MaxDistanceHelper(m_SurprisedFacePoints, info);
+			break;
+
+		case EExpressionEnum::Closed:
+			MaxDistanceHelper(m_ClosedFacePoints, info);
 			break;
 		}
 

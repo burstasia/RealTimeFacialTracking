@@ -22,9 +22,9 @@ void AFaceAnimations::BeginPlay()
 {
 	Super::BeginPlay();
 
-	m_FacialFeatureArray.Push(FFacialFeatureInfo{ "mouthSmileRight", 55, EExpressionEnum::Happy });
-
-	
+	m_FacialFeatureArray.Push(FFacialFeatureInfo{ "Smile_Lips_Opened_R_", 54, EExpressionEnum::Happy });
+	m_FacialFeatureArray.Push(FFacialFeatureInfo{ "Smile_Lips_Opened_L_", 48, EExpressionEnum::Happy });
+	m_FacialFeatureArray.Push(FFacialFeatureInfo{ "Mouth_Wide_Opened", 8, EExpressionEnum::Surprised });
 	
 }
 
@@ -109,7 +109,7 @@ void AFaceAnimations::SetFacialExpression(const TArray<FVector2D>& currentTracke
 		//x or Y
 		if (info.isY)
 		{
-			if (currentTrackedPoints[i].Y - m_LastFramePoints[i].Y > m_ThresholdMin && currentTrackedPoints[i].Y - m_LastFramePoints[i].Y < m_ThresholdMax)
+			if ((currentTrackedPoints[info.indexFeature].Y - m_LastFramePoints[info.indexFeature].Y) > m_ThresholdMin && (currentTrackedPoints[info.indexFeature].Y - m_LastFramePoints[info.indexFeature].Y) < m_ThresholdMax)
 			{
 				float value = distance.Y / scaledMaxDistance;
 

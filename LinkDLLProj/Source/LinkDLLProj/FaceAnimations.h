@@ -100,8 +100,8 @@ public:
 	int m_IndexMiddleFace{ 28 };
 
 	//might've gotten these confused
-	int m_LeftTemple{1};
-	int m_RightTemple{17};
+	int m_LeftTemple{0};
+	int m_RightTemple{16};
 	float m_DistanceBetweenTemples{};
 
 	float m_ThresholdMin{ 1.0f };

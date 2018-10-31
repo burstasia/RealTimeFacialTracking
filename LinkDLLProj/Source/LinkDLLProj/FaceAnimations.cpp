@@ -23,10 +23,10 @@ void AFaceAnimations::BeginPlay()
 	Super::BeginPlay();
 
 	m_FacialFeatureArray.Push(FFacialFeatureInfo{ "Smile_Lips_Opened_R_", 54, EExpressionEnum::Happy });
-	m_FacialFeatureArray.Push(FFacialFeatureInfo{ "Smile_Lips_Opened_L_", 48, EExpressionEnum::Happy });
-	m_FacialFeatureArray.Push(FFacialFeatureInfo{ "Mouth_Little_Opened", 8, EExpressionEnum::Surprised });
-	m_FacialFeatureArray.Push(FFacialFeatureInfo{ "Eye_Closed_L", 37, EExpressionEnum::Closed });
-	m_FacialFeatureArray.Push(FFacialFeatureInfo{ "Eye_Closed_R", 44, EExpressionEnum::Closed });
+	//m_FacialFeatureArray.Push(FFacialFeatureInfo{ "Smile_Lips_Opened_L_", 48, EExpressionEnum::Happy });
+	//m_FacialFeatureArray.Push(FFacialFeatureInfo{ "Mouth_Little_Opened", 8, EExpressionEnum::Surprised });
+	//m_FacialFeatureArray.Push(FFacialFeatureInfo{ "Eye_Closed_L", 37, EExpressionEnum::Closed });
+	//m_FacialFeatureArray.Push(FFacialFeatureInfo{ "Eye_Closed_R", 44, EExpressionEnum::Closed });
 	
 }
 
@@ -40,36 +40,39 @@ void AFaceAnimations::Tick(float DeltaTime)
 void AFaceAnimations::SetNeutralFace(const TArray<FVector2D>& trackedNeutral)
 {
 	m_NeutralFacePoints = trackedNeutral;
-
-
+	m_DistanceBetweenTemples = FVector2D::Distance(m_NeutralFacePoints[m_RightTemple], m_NeutralFacePoints[m_LeftTemple]);
 	TranslateFaceCoordinates(m_NeutralFacePoints);
+
 }
 
 void AFaceAnimations::SetSmileFace(const TArray<FVector2D>& trackedSmile)
 {
 	m_SmileFacePoints = trackedSmile;
+	TranslateFaceCoordinates(m_SmileFacePoints);
+
 }
 
 void AFaceAnimations::SetAngryFace(const TArray<FVector2D>& trackedAngry)
 {
 	m_AngryFacePoints = trackedAngry;
+	TranslateFaceCoordinates(m_AngryFacePoints);
 }
 
 void AFaceAnimations::SetSurprisedFace(const TArray<FVector2D>& trackedSurprised)
 {
 	m_SurprisedFacePoints = trackedSurprised;
+	TranslateFaceCoordinates(m_SurprisedFacePoints);
 
 }
 
 void AFaceAnimations::SetClosedEyes(const TArray<FVector2D>& trackedClosed)
 {
 	m_ClosedFacePoints = trackedClosed;
+	TranslateFaceCoordinates(m_ClosedFacePoints);
 	m_LastFramePoints = trackedClosed;
 }
 void AFaceAnimations::SetMinMax()
 {
-	m_DistanceBetweenTemples = m_NeutralFacePoints[m_RightTemple].X - m_NeutralFacePoints[m_LeftTemple].X;
-
 	for (int i = 0; i < m_FacialFeatureArray.Num(); i++)
 	{
 		FFacialFeatureInfo info = m_FacialFeatureArray[i];
@@ -77,19 +80,19 @@ void AFaceAnimations::SetMinMax()
 		switch (info.expression)
 		{
 		case EExpressionEnum::Angry:
-			MaxDistanceHelper(m_AngryFacePoints, info);
+			CalculateMaxDistance(m_AngryFacePoints, info);
 			break;
 
 		case EExpressionEnum::Happy:
-			MaxDistanceHelper(m_SmileFacePoints, info);
+			CalculateMaxDistance(m_SmileFacePoints, info);
 			break;
 
 		case EExpressionEnum::Surprised:
-			MaxDistanceHelper(m_SurprisedFacePoints, info);
+			CalculateMaxDistance(m_SurprisedFacePoints, info);
 			break;
 
 		case EExpressionEnum::Closed:
-			MaxDistanceHelper(m_ClosedFacePoints, info);
+			CalculateMaxDistance(m_ClosedFacePoints, info);
 			break;
 		}
 
@@ -100,82 +103,42 @@ void AFaceAnimations::SetMinMax()
 
 void AFaceAnimations::SetFacialExpression(const TArray<FVector2D>& currentTrackedPoints)
 {
-	FVector2D neutralTranslation{};
-	neutralTranslation = currentTrackedPoints[m_IndexMiddleFace] - m_NeutralFacePoints[m_IndexMiddleFace];
-
-	//adjusting for person moving closer/further from the camera
-	float currDistanceBetweenTemples = currentTrackedPoints[m_RightTemple].X - currentTrackedPoints[m_LeftTemple].X;
-	float percentageDifference = (currDistanceBetweenTemples / m_DistanceBetweenTemples) - 1.0f;
-
-	//threshold updated according to percentage difference
-	m_ThresholdMax = (m_ThresholdMax * percentageDifference) + m_ThresholdMax;
-	m_ThresholdMin = (m_ThresholdMin * percentageDifference) + m_ThresholdMin;
-	//if you are closer the threshold is bigger, further away and it's smaller
-
 	for (int i = 0; i < m_FacialFeatureArray.Num(); i++)
 	{
 		FFacialFeatureInfo info = m_FacialFeatureArray[i];
+		FVector2D currentPoint = currentTrackedPoints[info.indexFeature];
 
-		//adjust the neutral point to the current position of the head
-		info.neutralPos = m_NeutralFacePoints[info.indexFeature] + neutralTranslation;
+		TranslateFaceCoordinates(currentTrackedPoints, info.indexFeature, currentPoint);
 
-		//calculate this distance
-		FVector2D distance = currentTrackedPoints[info.indexFeature] - info.neutralPos;
+		FVector2D neutralPoint = m_NeutralFacePoints[info.indexFeature];
 
-		//only compare current distance between features if maxDistance has been adjusted
-		float scaledMaxDistance = (info.maxDistance * percentageDifference) + info.maxDistance;
-		//x or Y
+		FVector2D distance = currentPoint - neutralPoint;
+
 		if (info.isY)
 		{
-			if ((currentTrackedPoints[info.indexFeature].Y - m_LastFramePoints[info.indexFeature].Y) > m_ThresholdMin && (currentTrackedPoints[info.indexFeature].Y - m_LastFramePoints[info.indexFeature].Y) < m_ThresholdMax)
-			{
-				float value = distance.Y / scaledMaxDistance;
+			float value = distance.Y / info.maxDistance;
 
-				value = FMath::Abs(value);
+			value = FMath::Abs(value);
 
-				value = FMath::Clamp(value, 0.0f, 1.0f);
+			value = FMath::Clamp(value, 0.0f, 1.0f); //the most extreme of the face morph tends to look strange
 
-				m_pSkeleton->SetMorphTarget(info.morphTargetName, value);
-			}
-			
-			else
-			{
-				distance = m_LastFramePoints[info.indexFeature] - info.neutralPos;
+			m_pSkeleton->SetMorphTarget(info.morphTargetName, value);
 
-				float value = distance.Y / scaledMaxDistance;
-
-				value = FMath::Abs(value);
-
-				value = FMath::Clamp(value, 0.0f, 1.0f);
-
-				m_pSkeleton->SetMorphTarget(info.morphTargetName, value);
-
-			}
 		}
-		//compare it to the max distance
-
-		//if the distance last frame compared to the distance this frame is lower than a certain threshold 
-		//then we don't change the morph target
-
-		//also if the distance is bigger than a certain threshold then we don't change it either
-
-		//this way we aviod jittering and extreme movement because the face tracker bugs out occasionally
-		//set the morphTaget
+		//get the current distance from neutral 
 	}
-
-	m_LastFramePoints = currentTrackedPoints;
 
 }
 
-void AFaceAnimations::MaxDistanceHelper(const TArray<FVector2D>& expressionPoints, FFacialFeatureInfo & info)
+void AFaceAnimations::CalculateMaxDistance(const TArray<FVector2D>& expressionPoints, FFacialFeatureInfo & info)
 {
 	FVector2D neutralTranslation{}; 
 	FVector2D distance{};
 
-	neutralTranslation = expressionPoints[m_IndexMiddleFace] - m_NeutralFacePoints[m_IndexMiddleFace]; //get the vector representing the distance between the eyebrows 
-	info.neutralPos = m_NeutralFacePoints[info.indexFeature] + neutralTranslation;
+	//neutralTranslation = expressionPoints[m_IndexMiddleFace] - m_NeutralFacePoints[m_IndexMiddleFace]; //get the vector representing the distance between the eyebrows 
+	//info.neutralPos = m_NeutralFacePoints[info.indexFeature] + neutralTranslation;
 
-	distance = expressionPoints[info.indexFeature] - info.neutralPos;
+	distance = expressionPoints[info.indexFeature] - m_NeutralFacePoints[info.indexFeature];
 
 	if (info.isY)
 	{
@@ -187,30 +150,67 @@ void AFaceAnimations::MaxDistanceHelper(const TArray<FVector2D>& expressionPoint
 	}
 }
 
-void AFaceAnimations::TranslateFaceCoordinates(TArray<FVector2D>& currpoints)
+void AFaceAnimations::TranslateFaceCoordinates(TArray<FVector2D>& currPoints)
 {
 	FTransform worldMatrix{};
 
+	float currentDistance = FVector2D::Distance(currPoints[m_LeftTemple] , currPoints[m_RightTemple]);
+	
+	float scale = currentDistance / m_DistanceBetweenTemples;
+
+
 	//constrct vector nose
-	FVector tailNose = FVector{ 0, m_NeutralFacePoints[30].X , m_NeutralFacePoints[30].Y };
-	FVector headNose = FVector{ 0, m_NeutralFacePoints[27].X, m_NeutralFacePoints[27].Y};
-	FVector noseAxis = (headNose - tailNose); 
+	FVector tailNose = FVector{ 0, currPoints[30].X , currPoints[30].Y };
+	FVector headNose = FVector{ 0, currPoints[27].X, currPoints[27].Y };
+	FVector noseAxis = (headNose - tailNose);
 	noseAxis = noseAxis.GetSafeNormal();
 
 	FVector rightVector = FVector{ 0,1,0 };
 
 	//angle in radians
-	float angle = FMath::Acos(FVector::DotProduct(noseAxis, rightVector)) - (PI/2.0f);
+	float angle = FMath::Acos(FVector::DotProduct(noseAxis, rightVector)) - (PI / 2.0f);
 
-	worldMatrix.SetTranslation(FVector{ 0 ,-m_NeutralFacePoints[30].X, -m_NeutralFacePoints[30].Y});
-	worldMatrix.SetRotation(FQuat(FVector{ 1,0,0 }, angle));
+	worldMatrix.SetTranslation(FVector{ 0 ,-currPoints[30].X, -currPoints[30].Y });
+	worldMatrix.SetRotation(FQuat(FVector{ 1,0,0 }, -angle));
+	worldMatrix.SetScale3D(FVector{ 1 ,scale ,scale });
+	//TODO: scale
 
-
-	for (int i = 0; i < currpoints.Num(); i++)
+	for (int i = 0; i < currPoints.Num(); i++)
 	{
-		auto tempVector = worldMatrix.TransformFVector4(FVector4{ 0,currpoints[i].X, currpoints[i].Y,1 });
+		auto tempVector = worldMatrix.TransformFVector4(FVector4{ 0,currPoints[i].X, currPoints[i].Y,1 });
 
-		currpoints[i].X = tempVector.Y;
-		currpoints[i].Y = tempVector.Z;
+		currPoints[i].X = tempVector.Y;
+		currPoints[i].Y = tempVector.Z;
 	}
+}
+
+void AFaceAnimations::TranslateFaceCoordinates(const TArray<FVector2D>& currPoints, int indexFeature, FVector2D & currentPoint)
+{
+	FTransform worldMatrix{};
+
+	float currentDistance = FVector2D::Distance(currPoints[m_LeftTemple], currPoints[m_RightTemple]);
+
+	float scale = currentDistance / m_DistanceBetweenTemples;
+
+	//constrct vector nose
+	FVector tailNose = FVector{ 0, currPoints[30].X , currPoints[30].Y };
+	FVector headNose = FVector{ 0, currPoints[27].X, currPoints[27].Y };
+	FVector noseAxis = (headNose - tailNose);
+	noseAxis = noseAxis.GetSafeNormal();
+
+	FVector rightVector = FVector{ 0,1,0 };
+
+	//angle in radians
+	float angle = FMath::Acos(FVector::DotProduct(noseAxis, rightVector)) - (PI / 2.0f);
+
+	worldMatrix.SetTranslation(FVector{ 0 ,-currPoints[30].X, -currPoints[30].Y });
+	worldMatrix.SetRotation(FQuat(FVector{ 1,0,0 }, -angle));
+	worldMatrix.SetScale3D(FVector{ 1 ,scale ,scale });
+
+	
+	auto tempVector = worldMatrix.TransformFVector4(FVector4{ 0,currPoints[indexFeature].X, currPoints[indexFeature].Y,1 });
+
+	currentPoint.X = tempVector.Y;
+	currentPoint.Y = tempVector.Z;
+	
 }

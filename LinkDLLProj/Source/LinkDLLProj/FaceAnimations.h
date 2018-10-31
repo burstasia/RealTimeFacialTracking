@@ -111,8 +111,10 @@ public:
 	//these values were tweaked until the best solution was found
 	float m_ThresholdMin{ 1.8f };
 	float m_ThresholdMax{ 2.0f };
+
 private:
-	void MaxDistanceHelper(const TArray<FVector2D>& expressionPoints, FFacialFeatureInfo& info);
-	void TranslateFaceCoordinates(TArray<FVector2D>& currpoints);
+	void CalculateMaxDistance(const TArray<FVector2D>& expressionPoints, FFacialFeatureInfo& info);
+	void TranslateFaceCoordinates(TArray<FVector2D>& currPoints);
+	void TranslateFaceCoordinates(const TArray<FVector2D>& currPoints, int indexFeature, FVector2D& currentPoint);
 
 };

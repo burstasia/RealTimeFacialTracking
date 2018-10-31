@@ -113,6 +113,6 @@ public:
 	float m_ThresholdMax{ 2.0f };
 private:
 	void MaxDistanceHelper(const TArray<FVector2D>& expressionPoints, FFacialFeatureInfo& info);
-
+	void MatrixTesting(TArray<FVector2D>& currpoints);
 
 };

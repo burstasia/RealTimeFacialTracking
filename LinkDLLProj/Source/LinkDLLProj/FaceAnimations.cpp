@@ -40,6 +40,9 @@ void AFaceAnimations::Tick(float DeltaTime)
 void AFaceAnimations::SetNeutralFace(const TArray<FVector2D>& trackedNeutral)
 {
 	m_NeutralFacePoints = trackedNeutral;
+
+
+	MatrixTesting(m_NeutralFacePoints);
 }
 
 void AFaceAnimations::SetSmileFace(const TArray<FVector2D>& trackedSmile)
@@ -55,7 +58,6 @@ void AFaceAnimations::SetAngryFace(const TArray<FVector2D>& trackedAngry)
 void AFaceAnimations::SetSurprisedFace(const TArray<FVector2D>& trackedSurprised)
 {
 	m_SurprisedFacePoints = trackedSurprised;
-	m_LastFramePoints = trackedSurprised;
 
 }
 
@@ -162,6 +164,7 @@ void AFaceAnimations::SetFacialExpression(const TArray<FVector2D>& currentTracke
 	}
 
 	m_LastFramePoints = currentTrackedPoints;
+
 }
 
 void AFaceAnimations::MaxDistanceHelper(const TArray<FVector2D>& expressionPoints, FFacialFeatureInfo & info)
@@ -184,3 +187,33 @@ void AFaceAnimations::MaxDistanceHelper(const TArray<FVector2D>& expressionPoint
 	}
 }
 
+void AFaceAnimations::MatrixTesting(TArray<FVector2D>& currpoints)
+{
+	FTransform worldMatrix{};
+
+	//TODO: CHECK IF VECTOR IS FINE, GIVE IT SOME TEA
+	FTransform worldMatrix2D{};
+	//constrct vector nose
+	FVector tailNose = FVector{ m_NeutralFacePoints[30].X, m_NeutralFacePoints[30].Y, 1 };
+	FVector headNose = FVector{ m_NeutralFacePoints[27].X, m_NeutralFacePoints[27].Y, 1 };
+	FVector noseAxis = (headNose - tailNose); 
+	noseAxis = noseAxis.GetSafeNormal();
+
+	FVector rightVector = FVector{ 1,0,0 };
+
+	//angle in radians
+	float angle = FMath::Acos(FVector::DotProduct(noseAxis, rightVector));
+
+	worldMatrix.SetTranslation(FVector{ m_NeutralFacePoints[27].X, m_NeutralFacePoints[27].Y , 0 });
+	worldMatrix.SetRotation(FQuat(FVector{ 1,0,0 }, angle));
+
+	worldMatrix = worldMatrix.Inverse();
+
+	for (FVector2D& point : currpoints)
+	{
+		auto tempVector = worldMatrix.TransformVector(FVector{ point.X, point.Y, 0 });
+		point.X = tempVector.X;
+		point.Y = tempVector.Y;
+	}
+	
+}

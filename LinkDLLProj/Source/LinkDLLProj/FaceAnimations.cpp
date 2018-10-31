@@ -42,7 +42,7 @@ void AFaceAnimations::SetNeutralFace(const TArray<FVector2D>& trackedNeutral)
 	m_NeutralFacePoints = trackedNeutral;
 
 
-	MatrixTesting(m_NeutralFacePoints);
+	TranslateFaceCoordinates(m_NeutralFacePoints);
 }
 
 void AFaceAnimations::SetSmileFace(const TArray<FVector2D>& trackedSmile)
@@ -187,33 +187,30 @@ void AFaceAnimations::MaxDistanceHelper(const TArray<FVector2D>& expressionPoint
 	}
 }
 
-void AFaceAnimations::MatrixTesting(TArray<FVector2D>& currpoints)
+void AFaceAnimations::TranslateFaceCoordinates(TArray<FVector2D>& currpoints)
 {
 	FTransform worldMatrix{};
 
-	//TODO: CHECK IF VECTOR IS FINE, GIVE IT SOME TEA
-	FTransform worldMatrix2D{};
 	//constrct vector nose
-	FVector tailNose = FVector{ m_NeutralFacePoints[30].X, m_NeutralFacePoints[30].Y, 1 };
-	FVector headNose = FVector{ m_NeutralFacePoints[27].X, m_NeutralFacePoints[27].Y, 1 };
+	FVector tailNose = FVector{ 0, m_NeutralFacePoints[30].X , m_NeutralFacePoints[30].Y };
+	FVector headNose = FVector{ 0, m_NeutralFacePoints[27].X, m_NeutralFacePoints[27].Y};
 	FVector noseAxis = (headNose - tailNose); 
 	noseAxis = noseAxis.GetSafeNormal();
 
-	FVector rightVector = FVector{ 1,0,0 };
+	FVector rightVector = FVector{ 0,1,0 };
 
 	//angle in radians
-	float angle = FMath::Acos(FVector::DotProduct(noseAxis, rightVector));
+	float angle = FMath::Acos(FVector::DotProduct(noseAxis, rightVector)) - (PI/2.0f);
 
-	worldMatrix.SetTranslation(FVector{ m_NeutralFacePoints[27].X, m_NeutralFacePoints[27].Y , 0 });
+	worldMatrix.SetTranslation(FVector{ 0 ,-m_NeutralFacePoints[30].X, -m_NeutralFacePoints[30].Y});
 	worldMatrix.SetRotation(FQuat(FVector{ 1,0,0 }, angle));
 
-	worldMatrix = worldMatrix.Inverse();
 
-	for (FVector2D& point : currpoints)
+	for (int i = 0; i < currpoints.Num(); i++)
 	{
-		auto tempVector = worldMatrix.TransformVector(FVector{ point.X, point.Y, 0 });
-		point.X = tempVector.X;
-		point.Y = tempVector.Y;
+		auto tempVector = worldMatrix.TransformFVector4(FVector4{ 0,currpoints[i].X, currpoints[i].Y,1 });
+
+		currpoints[i].X = tempVector.Y;
+		currpoints[i].Y = tempVector.Z;
 	}
-	
 }

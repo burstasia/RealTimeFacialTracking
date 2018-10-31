@@ -108,6 +108,7 @@ public:
 	int m_RightTemple{16};
 	float m_DistanceBetweenTemples{};
 
+	//these values were tweaked until the best solution was found
 	float m_ThresholdMin{ 1.8f };
 	float m_ThresholdMax{ 2.0f };
 private:

@@ -105,6 +105,11 @@ void AFaceAnimations::SetFacialExpression(const TArray<FVector2D>& currentTracke
 	float currDistanceBetweenTemples = currentTrackedPoints[m_RightTemple].X - currentTrackedPoints[m_LeftTemple].X;
 	float percentageDifference = (currDistanceBetweenTemples / m_DistanceBetweenTemples) - 1.0f;
 
+	//threshold updated according to percentage difference
+	m_ThresholdMax = (m_ThresholdMax * percentageDifference) + m_ThresholdMax;
+	m_ThresholdMin = (m_ThresholdMin * percentageDifference) + m_ThresholdMin;
+	//if you are closer the threshold is bigger, further away and it's smaller
+
 	for (int i = 0; i < m_FacialFeatureArray.Num(); i++)
 	{
 		FFacialFeatureInfo info = m_FacialFeatureArray[i];

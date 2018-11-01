@@ -117,4 +117,5 @@ private:
 	void TranslateFaceCoordinates(TArray<FVector2D>& currPoints);
 	void TranslateFaceCoordinates(const TArray<FVector2D>& currPoints, int indexFeature, FVector2D& currentPoint);
 
+	bool m_IsNeutral;
 };

@@ -15,6 +15,8 @@ AFaceAnimations::AFaceAnimations()
 
 	m_pSkeleton = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("SkeletalMesh"));
 	m_pSkeleton->AttachTo(m_pRoot);
+
+	m_IsNeutral = true;
 }
 
 // Called when the game starts or when spawned
@@ -152,7 +154,6 @@ void AFaceAnimations::CalculateMaxDistance(const TArray<FVector2D>& expressionPo
 
 void AFaceAnimations::TranslateFaceCoordinates(TArray<FVector2D>& currPoints)
 {
-	FTransform worldMatrix{};
 
 	float currentDistance = FVector2D::Distance(currPoints[m_LeftTemple] , currPoints[m_RightTemple]);
 	
@@ -167,30 +168,44 @@ void AFaceAnimations::TranslateFaceCoordinates(TArray<FVector2D>& currPoints)
 
 	FVector rightVector = FVector{ 0,1,0 };
 
-	//angle in radians
-	float angle = FMath::Acos(FVector::DotProduct(noseAxis, rightVector)) - (PI / 2.0f);
+	//angle in radians 0.1
+	float angle = FMath::Acos(FVector::DotProduct(noseAxis, rightVector)) + (PI / 2.0f);
 
-	worldMatrix.SetTranslation(FVector{ 0 ,-currPoints[30].X, -currPoints[30].Y });
-	worldMatrix.SetRotation(FQuat(FVector{ 1,0,0 }, -angle));
-	worldMatrix.SetScale3D(FVector{ 1 ,scale ,scale });
-	//TODO: scale
+	FTransform translationComponent{ FVector{0 ,currPoints[30].X, currPoints[30].Y} };
 
 	for (int i = 0; i < currPoints.Num(); i++)
 	{
-		auto tempVector = worldMatrix.TransformFVector4(FVector4{ 0,currPoints[i].X, currPoints[i].Y,1 });
+		auto newVector = translationComponent.SubtractTranslations(FTransform{ FVector{0.0f, currPoints[i].X, currPoints[i].Y} }, translationComponent);
+		
+		FVector2D translatedRotatedPoint{};
+		translatedRotatedPoint.X = (newVector.Y  * FMath::Cos(angle)) - (newVector.Z * FMath::Sin(angle));
+		translatedRotatedPoint.Y = (newVector.Z  * FMath::Cos(angle)) + (newVector.Y * FMath::Sin(angle));
 
-		currPoints[i].X = tempVector.Y;
-		currPoints[i].Y = tempVector.Z;
+		newVector.Y = translatedRotatedPoint.X;
+		newVector.Z = translatedRotatedPoint.Y;
+
+		newVector = FVector{0.0f, (newVector.Y * (1.0f - scale) + newVector.Y), (newVector.Z * (1.0f - scale) + newVector.Z )};
+
+		//adjusting because points are always just a little bit off
+		FVector2D distance{0.0f,0.0f};
+		if (!m_IsNeutral)
+		{
+			FVector2D distance = currPoints[0] - m_NeutralFacePoints[0];
+		}
+
+		currPoints[i].X = newVector.Y + distance.X;
+		currPoints[i].Y = newVector.Z + distance.Y;
+
+		m_IsNeutral = false;
 	}
 }
 
 void AFaceAnimations::TranslateFaceCoordinates(const TArray<FVector2D>& currPoints, int indexFeature, FVector2D & currentPoint)
 {
-	FTransform worldMatrix{};
-
 	float currentDistance = FVector2D::Distance(currPoints[m_LeftTemple], currPoints[m_RightTemple]);
 
 	float scale = currentDistance / m_DistanceBetweenTemples;
+
 
 	//constrct vector nose
 	FVector tailNose = FVector{ 0, currPoints[30].X , currPoints[30].Y };
@@ -200,17 +215,33 @@ void AFaceAnimations::TranslateFaceCoordinates(const TArray<FVector2D>& currPoin
 
 	FVector rightVector = FVector{ 0,1,0 };
 
-	//angle in radians
-	float angle = FMath::Acos(FVector::DotProduct(noseAxis, rightVector)) - (PI / 2.0f);
+	//angle in radians 0.1
+	float angle = FMath::Acos(FVector::DotProduct(noseAxis, rightVector)) + (PI / 2.0f);
 
-	worldMatrix.SetTranslation(FVector{ 0 ,-currPoints[30].X, -currPoints[30].Y });
-	worldMatrix.SetRotation(FQuat(FVector{ 1,0,0 }, -angle));
-	worldMatrix.SetScale3D(FVector{ 1 ,scale ,scale });
+	FTransform translationComponent{ FVector{ 0 ,currPoints[30].X, currPoints[30].Y } };
 
-	
-	auto tempVector = worldMatrix.TransformFVector4(FVector4{ 0,currPoints[indexFeature].X, currPoints[indexFeature].Y,1 });
 
-	currentPoint.X = tempVector.Y;
-	currentPoint.Y = tempVector.Z;
+	auto newVector = translationComponent.SubtractTranslations(FTransform{ FVector{ 0.0f, currPoints[indexFeature].X, currPoints[indexFeature].Y } }, translationComponent);
+
+	FVector2D translatedRotatedPoint{};
+	translatedRotatedPoint.X = (newVector.Y  * FMath::Cos(angle)) - (newVector.Z * FMath::Sin(angle));
+	translatedRotatedPoint.Y = (newVector.Z  * FMath::Cos(angle)) + (newVector.Y * FMath::Sin(angle));
+
+	newVector.Y = translatedRotatedPoint.X;
+	newVector.Z = translatedRotatedPoint.Y;
+
+	newVector = FVector{ 0.0f, (newVector.Y * (1.0f - scale) + newVector.Y), (newVector.Z * (1.0f - scale) + newVector.Z) };
+
+	//adjusting because points are always just a little bit off
+	FVector2D distance{ 0.0f,0.0f };
+	if (!m_IsNeutral)
+	{
+		FVector2D distance = currPoints[0] - m_NeutralFacePoints[0];
+	}
+
+	currPoints[i].X = newVector.Y + distance.X;
+	currPoints[i].Y = newVector.Z + distance.Y;
+
+	m_IsNeutral = false;
 	
 }

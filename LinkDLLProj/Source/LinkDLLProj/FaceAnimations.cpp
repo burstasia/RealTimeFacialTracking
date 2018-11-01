@@ -25,10 +25,12 @@ void AFaceAnimations::BeginPlay()
 	Super::BeginPlay();
 
 	m_FacialFeatureArray.Push(FFacialFeatureInfo{ "Smile_Lips_Opened_R_", 54, EExpressionEnum::Happy });
-	//m_FacialFeatureArray.Push(FFacialFeatureInfo{ "Smile_Lips_Opened_L_", 48, EExpressionEnum::Happy });
-	//m_FacialFeatureArray.Push(FFacialFeatureInfo{ "Mouth_Little_Opened", 8, EExpressionEnum::Surprised });
-	//m_FacialFeatureArray.Push(FFacialFeatureInfo{ "Eye_Closed_L", 37, EExpressionEnum::Closed });
-	//m_FacialFeatureArray.Push(FFacialFeatureInfo{ "Eye_Closed_R", 44, EExpressionEnum::Closed });
+	m_FacialFeatureArray.Push(FFacialFeatureInfo{ "Smile_Lips_Opened_L_", 48, EExpressionEnum::Happy });
+	m_FacialFeatureArray.Push(FFacialFeatureInfo{ "Mouth_Little_Opened", 8, EExpressionEnum::Surprised });
+	m_FacialFeatureArray.Push(FFacialFeatureInfo{ "Eyebrows_Frown_R", 23, EExpressionEnum::Angry });
+	m_FacialFeatureArray.Push(FFacialFeatureInfo{ "Eyebrows_Frown_L", 20, EExpressionEnum::Angry });
+	m_FacialFeatureArray.Push(FFacialFeatureInfo{ "Eye_Closed_L", 37, EExpressionEnum::Closed });
+	m_FacialFeatureArray.Push(FFacialFeatureInfo{ "Eye_Closed_R", 44, EExpressionEnum::Closed });
 	
 }
 
@@ -239,8 +241,8 @@ void AFaceAnimations::TranslateFaceCoordinates(const TArray<FVector2D>& currPoin
 		FVector2D distance = currPoints[0] - m_NeutralFacePoints[0];
 	}
 
-	currPoints[i].X = newVector.Y + distance.X;
-	currPoints[i].Y = newVector.Z + distance.Y;
+	currentPoint.X = newVector.Y + distance.X;
+	currentPoint.Y = newVector.Z + distance.Y;
 
 	m_IsNeutral = false;
 	

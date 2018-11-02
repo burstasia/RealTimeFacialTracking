@@ -109,7 +109,7 @@ public:
 	float m_DistanceBetweenTemples{};
 
 	//these values were tweaked until the best solution was found
-	float m_ThresholdMin{ 1.8f };
+	float m_ThresholdMin{ 1.0f };
 	float m_ThresholdMax{ 2.0f };
 
 private:

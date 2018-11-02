@@ -5,6 +5,8 @@
 #include "opencv2/imgproc.hpp"
 #include "opencv2/face.hpp"
 
+#include "PropertyManager.h"
+
 #include <iostream>
 #include <string>
 #include <ctime>
@@ -21,10 +23,18 @@ using namespace cv::face;
 FaceTracker::FaceTracker()
 {
 	//TOD: relative paths
+	
 	m_Facemark = createFacemarkLBF();
-	m_Facemark->loadModel("D:/DAE/5thSemester/GradWork/Week_03/LinkDLLProj/Plugins/DLLs/lbfmodel.yaml");
 
-	m_Cascade.load("D:/DAE/5thSemester/GradWork/Week_03/LinkDLLProj/Plugins/DLLs/haarcascade_frontalface_alt2.xml");
+	std::string dllPath{ PropertyManager::path.begin() , PropertyManager::path.end() };// = PropertyManager::path.begin();
+
+	int last{};
+	last = dllPath.find_last_of('\\');
+	dllPath = dllPath.substr(0,last);
+
+	m_Facemark->loadModel(dllPath  + "\\lbfmodel.yaml");
+
+	m_Cascade.load(dllPath + "\\haarcascade_frontalface_alt2.xml");
 
 }
 

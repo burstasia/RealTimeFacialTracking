@@ -156,7 +156,7 @@ void AFaceAnimations::CalculateMaxDistance(const TArray<FVector2D>& expressionPo
 
 void AFaceAnimations::TranslateFaceCoordinates(TArray<FVector2D>& currPoints)
 {
-
+	
 	float currentDistance = FVector2D::Distance(currPoints[m_LeftTemple] , currPoints[m_RightTemple]);
 	
 	float scale = currentDistance / m_DistanceBetweenTemples;

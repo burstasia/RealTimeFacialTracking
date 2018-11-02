@@ -152,6 +152,7 @@
   <ItemGroup>
     <ClInclude Include="DLL.h" />
     <ClInclude Include="FaceTracker.h" />
+    <ClInclude Include="PropertyManager.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
   </ItemGroup>
@@ -159,6 +160,7 @@
     <ClCompile Include="dllmain.cpp" />
     <ClCompile Include="DLL.cpp" />
     <ClCompile Include="FaceTracker.cpp" />
+    <ClCompile Include="PropertyManager.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>

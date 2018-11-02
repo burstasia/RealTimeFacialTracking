@@ -27,6 +27,9 @@
     <ClInclude Include="FaceTracker.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="PropertyManager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -39,6 +42,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="FaceTracker.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="PropertyManager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

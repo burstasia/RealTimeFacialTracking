@@ -93,38 +93,6 @@ bool ULinkDLL::importMethodReturnTrackedPoints()
 #pragma endregion Import Methods
 
 #pragma region Method Calls
-//void ULinkDLL::returnTrackedPointsFromDLL(char * buf, int count, TArray<float>& points)
-//{
-//	if (m_returnTrackedPointsFromDll != NULL)
-//	{
-//		m_returnTrackedPointsFromDll(buf, count);
-//
-//	}
-//}
-//float ULinkDLL::returnTrackedPointsFromDLL()
-//{
-//	if (m_returnTrackedPointsFromDll != NULL)
-//	{
-//		float out = m_returnTrackedPointsFromDll();
-//		return out;
-//	}
-//	else return 314351.0f;
-//}
-
-//void ULinkDLL::returnTrackedPointsFromDLLArray(TArray<FVector2D> points, TArray<FVector2D>& pointsReturn)
-//{
-//	pointsReturn = points;
-//
-//
-//	if (m_returnTrackedPointsFromDll != NULL)
-//	{
-//		for (int i = 0; i < pointsReturn.Max(); i++)
-//		{
-//			pointsReturn[i].X = m_returnTrackedPointsFromDll(i, true);
-//			pointsReturn[i].Y = m_returnTrackedPointsFromDll(i, false);
-//		}
-//	}
-//}
 
 void ULinkDLL::returnTrackedPointsFromDLLArray(TArray<FVector2D>& pointsReturn)
 {

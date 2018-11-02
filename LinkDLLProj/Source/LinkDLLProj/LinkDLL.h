@@ -23,10 +23,7 @@ class LINKDLLPROJ_API ULinkDLL : public UBlueprintFunctionLibrary
 	UFUNCTION(BlueprintCallable, Category = "My DLL Library") static void initFaceTracker();
 
 	UFUNCTION(BlueprintCallable, Category = "My DLL Library") static bool importMethodReturnTrackedPoints();
-	//UFUNCTION(BlueprintCallable, Category = "My DLL Library") static float returnTrackedPointsFromDLL();
-
-	//UFUNCTION(BlueprintCallable, Category = "My DLL Library") static void returnTrackedPointsFromDLLArray(TArray<FVector2D> points,TArray<FVector2D>& pointsReturn);
-
+	
 	UFUNCTION(BlueprintCallable, Category = "My DLL Library") static void returnTrackedPointsFromDLLArray(TArray<FVector2D>& pointsReturn);
 
 	static float m_pPointArray[136];

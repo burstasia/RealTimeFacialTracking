@@ -12,7 +12,6 @@ public:
 	FaceTracker();
 	~FaceTracker();
 
-	void Init();
 	void GetLandmark(float * buf, int size);
 private:
 	

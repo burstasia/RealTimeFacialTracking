@@ -22,8 +22,7 @@ using namespace cv::face;
 
 FaceTracker::FaceTracker()
 {
-	//TOD: relative paths
-	
+	//relative path
 	m_Facemark = createFacemarkLBF();
 
 	std::string dllPath{ PropertyManager::path.begin() , PropertyManager::path.end() };// = PropertyManager::path.begin();
@@ -38,13 +37,7 @@ FaceTracker::FaceTracker()
 
 }
 
-
 FaceTracker::~FaceTracker()
-{
-}
-
-
-void FaceTracker::Init()
 {
 }
 

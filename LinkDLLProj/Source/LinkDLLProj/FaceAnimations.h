@@ -15,7 +15,8 @@ namespace EExpressionEnum
 		Surprised = 0,
 		Angry = 1,
 		Happy = 2,
-		Closed = 3
+		Closed = 3,
+		Pucker = 4
 	};
 }
 
@@ -36,16 +37,25 @@ struct FFacialFeatureInfo
 			int indexFeature;
 		UPROPERTY()
 			TEnumAsByte<EExpressionEnum::ExpressionTypes> expression;
+		UPROPERTY()
+			bool compareOtherIndex;
+		UPROPERTY()
+			FVector2D indexFeatureCompare;
+		UPROPERTY()
+			bool isOpen;
 
 		FFacialFeatureInfo()
 		{}
-		FFacialFeatureInfo(const FName& morphName, int indexFeature, TEnumAsByte<EExpressionEnum::ExpressionTypes> expressionFeature) :
+		FFacialFeatureInfo(const FName& morphName, int indexFeature, TEnumAsByte<EExpressionEnum::ExpressionTypes> expressionFeature, bool compare, FVector2D indexOther, bool isOpen) :
 			maxDistance(0.0f),
 			neutralPos(FVector2D{ 0.0f,0.0f }),
 			isY(true),
 			morphTargetName(morphName),
 			indexFeature(indexFeature),
-			expression(expressionFeature)
+			expression(expressionFeature),
+			compareOtherIndex(compare),
+			indexFeatureCompare(indexOther),
+			isOpen(isOpen)
 		{}
 };
 
@@ -73,6 +83,7 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Calibration") void SetAngryFace(const TArray<FVector2D>& trackedAngry);
 	UFUNCTION(BlueprintCallable, Category = "Calibration") void SetSurprisedFace(const TArray<FVector2D>& trackedSurprised);
 	UFUNCTION(BlueprintCallable, Category = "Calibration") void SetClosedEyes(const TArray<FVector2D>& trackedClosed);
+	UFUNCTION(BlueprintCallable, Category = "Calibration") void SetPucker(const TArray<FVector2D>& trackedPucker);
 
 	UFUNCTION(BlueprintCallable, Category = "Calibration") void SetMinMax();
 
@@ -88,6 +99,8 @@ public:
 		TArray<FVector2D> m_SurprisedFacePoints;
 	UPROPERTY()
 		TArray<FVector2D> m_ClosedFacePoints;
+	UPROPERTY()
+		TArray<FVector2D> m_PuckerFacePoints;
 
 	UPROPERTY()
 		TArray<FFacialFeatureInfo> m_FacialFeatureArray;
@@ -116,6 +129,6 @@ private:
 	void CalculateMaxDistance(const TArray<FVector2D>& expressionPoints, FFacialFeatureInfo& info);
 	void TranslateFaceCoordinates(TArray<FVector2D>& currPoints);
 	void TranslateFaceCoordinates(const TArray<FVector2D>& currPoints, int indexFeature, FVector2D& currentPoint);
-
+	void SetValue(const TArray<FVector2D>& currPoints, FFacialFeatureInfo& info);
 	bool m_IsNeutral;
 };

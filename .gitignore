@@ -17,7 +17,7 @@
 # Compiled Dynamic libraries
 *.so
 *.dylib
-*.dll
+#*.dll
 
 # Fortran module files
 *.mod
@@ -436,3 +436,6 @@ ASALocalRun/
 #training models
 **/**/haarcascade_frontalface_alt2.xml
 **/**/lbfmodel.yaml
+
+#openCv stuff
+**/**/ThirdParty

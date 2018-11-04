@@ -30,10 +30,13 @@ void AFaceAnimations::BeginPlay()
 	m_FacialFeatureArray.Push(FFacialFeatureInfo{ "Smile_Lips_Closed_L_", 48, EExpressionEnum::Happy, true,{ 62.0f, 66.0f }, false });
 	
 	m_FacialFeatureArray.Push(FFacialFeatureInfo{ "Mouth_Little_Opened", 8, EExpressionEnum::Surprised, true,{ 62.0f, 66.0f }, true });
-	m_FacialFeatureArray.Push(FFacialFeatureInfo{ "Eyebrows_Frown_R", 23, EExpressionEnum::Angry, false, {0.0f,0.0f}, false });
-	m_FacialFeatureArray.Push(FFacialFeatureInfo{ "Eyebrows_Frown_L", 20, EExpressionEnum::Angry, false,{ 0.0f,0.0f }, false });
-	//m_FacialFeatureArray.Push(FFacialFeatureInfo{ "Eye_Closed_L", 37, EExpressionEnum::Closed });
-	//m_FacialFeatureArray.Push(FFacialFeatureInfo{ "Eye_Closed_R", 44, EExpressionEnum::Closed });
+	m_FacialFeatureArray.Push(FFacialFeatureInfo{ "Eyebrows_Frown_R", 22, EExpressionEnum::Angry, false, {0.0f,0.0f}, false });
+	m_FacialFeatureArray.Push(FFacialFeatureInfo{ "Eyebrows_Frown_L", 21, EExpressionEnum::Angry, false,{ 0.0f,0.0f }, false });
+	m_FacialFeatureArray.Push(FFacialFeatureInfo{ "Eyebrow_Raised_R_", 24, EExpressionEnum::Surprised, false,{ 0.0f,0.0f }, false });
+	m_FacialFeatureArray.Push(FFacialFeatureInfo{ "Eyebrow_Raised_L_", 19, EExpressionEnum::Surprised, false,{ 0.0f,0.0f }, false });
+	//m_FacialFeatureArray.Push(FFacialFeatureInfo{ "Eye_Closed_L", 37, EExpressionEnum::Closed, false, {0.0f,0.0f}, false });
+	//m_FacialFeatureArray.Push(FFacialFeatureInfo{ "Eye_Closed_R", 44, EExpressionEnum::Closed, false,{ 0.0f,0.0f }, false });
+
 	//m_FacialFeatureArray.Push(FFacialFeatureInfo{ "Frown_R_", 54, EExpressionEnum::Angry, true, {62.0f, 66.0f}, false });
 	//m_FacialFeatureArray.Push(FFacialFeatureInfo{ "Frown_L_", 48, EExpressionEnum::Angry, true,{ 62.0f, 66.0f }, false });
 	//m_FacialFeatureArray.Push(FFacialFeatureInfo{ "Kiss_R_", 54, EExpressionEnum::Pucker, true,{ 62.0f, 66.0f }, false });
@@ -130,42 +133,43 @@ void AFaceAnimations::SetFacialExpression(const TArray<FVector2D>& currentTracke
 	{
 		FFacialFeatureInfo info = m_FacialFeatureArray[i];
 
-		if (info.compareOtherIndex)
+		float distance = FVector2D::Distance(m_LastFramePoints[info.indexFeature], currentTrackedPoints[info.indexFeature]);
+		if (distance > m_ThresholdMin && distance < m_ThresholdMax)
 		{
-			//compare the distances of the compared indexes
-			FVector2D point1 = currentTrackedPoints[int(info.indexFeatureCompare.X)];
-			FVector2D point2 = currentTrackedPoints[int(info.indexFeatureCompare.X)];
-
-			TranslateFaceCoordinates(currentTrackedPoints, int(info.indexFeatureCompare.X), point1);
-			TranslateFaceCoordinates(currentTrackedPoints, int(info.indexFeatureCompare.Y), point2);
-
-			float distance = FMath::Abs(FVector2D::Distance(point1, point2));
-
-			//if the following conditions are not met then don't set the values at all
-			//so if we have a morph target that has an open smile, and the mouth isn't open, then the value shouldn't be set
-			if (info.isOpen && distance > 6.0f)
+			if (info.compareOtherIndex)
 			{
-				SetValue(currentTrackedPoints, info);
-			}
-			else if (!info.isOpen && distance < 6.0f)
-			{
-				SetValue(currentTrackedPoints, info);
+				//compare the distances of the compared indexes
+				FVector2D point1 = currentTrackedPoints[int(info.indexFeatureCompare.X)];
+				FVector2D point2 = currentTrackedPoints[int(info.indexFeatureCompare.X)];
+
+				TranslateFaceCoordinates(currentTrackedPoints, int(info.indexFeatureCompare.X), point1);
+				TranslateFaceCoordinates(currentTrackedPoints, int(info.indexFeatureCompare.Y), point2);
+
+				float distance = FMath::Abs(FVector2D::Distance(point1, point2));
+
+				//if the following conditions are not met then don't set the values at all
+				//so if we have a morph target that has an open smile, and the mouth isn't open, then the value shouldn't be set
+				if (info.isOpen && distance > 3.0f)
+				{
+					SetValue(currentTrackedPoints, info);
+				}
+				else if (!info.isOpen && distance < 3.0f)
+				{
+					SetValue(currentTrackedPoints, info);
+				}
+				else
+				{
+					m_pSkeleton->SetMorphTarget(info.morphTargetName, 0.0f);
+				}
 			}
 			else
 			{
-				m_pSkeleton->SetMorphTarget(info.morphTargetName, 0.0f);
+				SetValue(currentTrackedPoints, info);
 			}
 		}
-		else
-		{
-			SetValue(currentTrackedPoints, info);
-		}
-
-		
-		
 	}
-
-	TranslateFaceCoordinates(m_LastFramePoints);
+	m_LastFramePoints = currentTrackedPoints;
+	
 }
 
 void AFaceAnimations::CalculateMaxDistance(const TArray<FVector2D>& expressionPoints, FFacialFeatureInfo & info)

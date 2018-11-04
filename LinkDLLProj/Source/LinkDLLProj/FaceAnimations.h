@@ -122,8 +122,8 @@ public:
 	float m_DistanceBetweenTemples{};
 
 	//these values were tweaked until the best solution was found
-	float m_ThresholdMin{ 1.0f };
-	float m_ThresholdMax{ 2.0f };
+	float m_ThresholdMin{ 0.5f };
+	float m_ThresholdMax{ 7.0f };
 
 private:
 	void CalculateMaxDistance(const TArray<FVector2D>& expressionPoints, FFacialFeatureInfo& info);

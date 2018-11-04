@@ -17,7 +17,7 @@ class LINKDLLPROJ_API ULinkDLL : public UBlueprintFunctionLibrary
 	explicit ULinkDLL();
 	~ULinkDLL();
 
-	UFUNCTION(BlueprintCallable, Category = "My DLL Library") static bool importDLL(FString folder, FString name);
+	UFUNCTION(BlueprintCallable, Category = "My DLL Library") static bool importDLL(FString folder, FString name, FString& filePathReturn);
 	
 	UFUNCTION(BlueprintCallable, Category = "My DLL Library") static bool importMethodInitFaceTracker();
 	UFUNCTION(BlueprintCallable, Category = "My DLL Library") static void initFaceTracker();

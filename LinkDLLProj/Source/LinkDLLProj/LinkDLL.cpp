@@ -1,6 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #include "LinkDLL.h"
+#include "Engine/GameEngine.h"
 
 //typedef void(*_returnTrackedPoints)(char *buf, int count); //create a method to store the DLL method returnTrackedPoints
 
@@ -27,9 +28,11 @@ ULinkDLL::~ULinkDLL()
 {
 }
 
-bool ULinkDLL::importDLL(FString folder, FString name)
+bool ULinkDLL::importDLL(FString folder, FString name, FString& filePathReturn)
 {
 	FString filePath = *FPaths::ProjectPluginsDir() + folder + "/" + name;
+
+	filePathReturn = filePath;
 
 	if (FPaths::FileExists(filePath))
 	{

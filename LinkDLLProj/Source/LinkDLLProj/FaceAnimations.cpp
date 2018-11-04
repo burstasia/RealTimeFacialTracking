@@ -30,8 +30,8 @@ void AFaceAnimations::BeginPlay()
 	m_FacialFeatureArray.Push(FFacialFeatureInfo{ "Smile_Lips_Closed_L_", 48, EExpressionEnum::Happy, true,{ 62.0f, 66.0f }, false });
 	
 	m_FacialFeatureArray.Push(FFacialFeatureInfo{ "Mouth_Little_Opened", 8, EExpressionEnum::Surprised, true,{ 62.0f, 66.0f }, true });
-	m_FacialFeatureArray.Push(FFacialFeatureInfo{ "Eyebrows_Frown_R", 22, EExpressionEnum::Angry, false, {0.0f,0.0f}, false });
-	m_FacialFeatureArray.Push(FFacialFeatureInfo{ "Eyebrows_Frown_L", 21, EExpressionEnum::Angry, false,{ 0.0f,0.0f }, false });
+	m_FacialFeatureArray.Push(FFacialFeatureInfo{ "Nostrils_Sneer_L_", 22, EExpressionEnum::Angry, false, {0.0f,0.0f}, false });
+	m_FacialFeatureArray.Push(FFacialFeatureInfo{ "Nostrils_Sneer_R_", 21, EExpressionEnum::Angry, false,{ 0.0f,0.0f }, false });
 	m_FacialFeatureArray.Push(FFacialFeatureInfo{ "Eyebrow_Raised_R_", 24, EExpressionEnum::Surprised, false,{ 0.0f,0.0f }, false });
 	m_FacialFeatureArray.Push(FFacialFeatureInfo{ "Eyebrow_Raised_L_", 19, EExpressionEnum::Surprised, false,{ 0.0f,0.0f }, false });
 	//m_FacialFeatureArray.Push(FFacialFeatureInfo{ "Eye_Closed_L", 37, EExpressionEnum::Closed, false, {0.0f,0.0f}, false });

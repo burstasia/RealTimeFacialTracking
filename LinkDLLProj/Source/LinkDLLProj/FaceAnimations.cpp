@@ -26,17 +26,23 @@ void AFaceAnimations::BeginPlay()
 
 	m_FacialFeatureArray.Push(FFacialFeatureInfo{ "Smile_Lips_Opened_R_", 54, EExpressionEnum::Happy, true,  {62.0f, 66.0f}, true });
 	m_FacialFeatureArray.Push(FFacialFeatureInfo{ "Smile_Lips_Opened_L_", 48, EExpressionEnum::Happy, true,  { 62.0f, 66.0f }, true });
+	m_FacialFeatureArray.Push(FFacialFeatureInfo{ "Neck_Sternomastoid_Contracted", 48, EExpressionEnum::Happy, true,{ 62.0f, 66.0f }, true });
 	m_FacialFeatureArray.Push(FFacialFeatureInfo{ "Smile_Lips_Closed_R_", 54, EExpressionEnum::Happy, true,{ 62.0f, 66.0f }, false });
 	m_FacialFeatureArray.Push(FFacialFeatureInfo{ "Smile_Lips_Closed_L_", 48, EExpressionEnum::Happy, true,{ 62.0f, 66.0f }, false });
 	
 	m_FacialFeatureArray.Push(FFacialFeatureInfo{ "Mouth_Little_Opened", 8, EExpressionEnum::Surprised, true,{ 62.0f, 66.0f }, true });
-	m_FacialFeatureArray.Push(FFacialFeatureInfo{ "Nostrils_Sneer_L_", 22, EExpressionEnum::Angry, false, {0.0f,0.0f}, false });
-	m_FacialFeatureArray.Push(FFacialFeatureInfo{ "Nostrils_Sneer_R_", 21, EExpressionEnum::Angry, false,{ 0.0f,0.0f }, false });
-	m_FacialFeatureArray.Push(FFacialFeatureInfo{ "Eyebrow_Raised_R_", 24, EExpressionEnum::Surprised, false,{ 0.0f,0.0f }, false });
-	m_FacialFeatureArray.Push(FFacialFeatureInfo{ "Eyebrow_Raised_L_", 19, EExpressionEnum::Surprised, false,{ 0.0f,0.0f }, false });
-	//m_FacialFeatureArray.Push(FFacialFeatureInfo{ "Eye_Closed_L", 37, EExpressionEnum::Closed, false, {0.0f,0.0f}, false });
-	//m_FacialFeatureArray.Push(FFacialFeatureInfo{ "Eye_Closed_R", 44, EExpressionEnum::Closed, false,{ 0.0f,0.0f }, false });
 
+
+	//m_FacialFeatureArray.Push(FFacialFeatureInfo{ "Nostrils_Frown_L_", 22, EExpressionEnum::Angry, false, {0.0f,0.0f}, false });
+	//m_FacialFeatureArray[5].isY = false;
+	//m_FacialFeatureArray.Push(FFacialFeatureInfo{ "Nostrils_Frown_R_", 21, EExpressionEnum::Angry, false,{ 0.0f,0.0f }, false });
+	//m_FacialFeatureArray[6].isY = false;
+	//m_FacialFeatureArray.Push(FFacialFeatureInfo{ "Eyebrow_Raised_R_", 24, EExpressionEnum::Surprised, false,{ 0.0f,0.0f }, false });
+	//m_FacialFeatureArray.Push(FFacialFeatureInfo{ "Eyebrow_Raised_L_", 19, EExpressionEnum::Surprised, false,{ 0.0f,0.0f }, false });
+	m_FacialFeatureArray.Push(FFacialFeatureInfo{ "Eye_Closed_L", 37, EExpressionEnum::Closed, false, {0.0f,0.0f}, false });
+	m_FacialFeatureArray.Push(FFacialFeatureInfo{ "Eye_Closed_R", 44, EExpressionEnum::Closed, false,{ 0.0f,0.0f }, false });
+	m_FacialFeatureArray.Push(FFacialFeatureInfo{ "Eyes_Opened_Max_L", 37, EExpressionEnum::Surprised, false,{ 0.0f,0.0f }, false });
+	m_FacialFeatureArray.Push(FFacialFeatureInfo{ "Eyes_Opened_Max_R", 44, EExpressionEnum::Surprised, false,{ 0.0f,0.0f }, false });
 	//m_FacialFeatureArray.Push(FFacialFeatureInfo{ "Frown_R_", 54, EExpressionEnum::Angry, true, {62.0f, 66.0f}, false });
 	//m_FacialFeatureArray.Push(FFacialFeatureInfo{ "Frown_L_", 48, EExpressionEnum::Angry, true,{ 62.0f, 66.0f }, false });
 	//m_FacialFeatureArray.Push(FFacialFeatureInfo{ "Kiss_R_", 54, EExpressionEnum::Pucker, true,{ 62.0f, 66.0f }, false });
@@ -126,7 +132,7 @@ void AFaceAnimations::SetMinMax()
 
 		m_FacialFeatureArray[i] = info;
 	}
-
+	
 }
 
 void AFaceAnimations::SetFacialExpression(const TArray<FVector2D>& currentTrackedPoints)
@@ -136,8 +142,13 @@ void AFaceAnimations::SetFacialExpression(const TArray<FVector2D>& currentTracke
 	for (int i = 0; i < m_FacialFeatureArray.Num(); i++)
 	{
 		FFacialFeatureInfo info = m_FacialFeatureArray[i];
+		FVector2D last{};
+		FVector2D current{};
 
-		float distance = FVector2D::Distance(m_LastFramePoints[info.indexFeature], currentTrackedPoints[info.indexFeature]);
+		TranslateFaceCoordinates(m_LastFramePoints, info.indexFeature, last);
+		TranslateFaceCoordinates(currentTrackedPoints, info.indexFeature, current);
+
+		float distance = FVector2D::Distance(last, current);
 		if (distance > m_ThresholdMin && distance < m_ThresholdMax)
 		{
 			if (info.compareOtherIndex)
@@ -179,13 +190,13 @@ void AFaceAnimations::SetFacialExpression(const TArray<FVector2D>& currentTracke
 
 void AFaceAnimations::CalculateMaxDistance(const TArray<FVector2D>& expressionPoints, FFacialFeatureInfo & info)
 {
-	FVector2D neutralTranslation{}; 
+
 	FVector2D distance{};
 
 	//neutralTranslation = expressionPoints[m_IndexMiddleFace] - m_NeutralFacePoints[m_IndexMiddleFace]; //get the vector representing the distance between the eyebrows 
 	//info.neutralPos = m_NeutralFacePoints[info.indexFeature] + neutralTranslation;
 
-	distance = (expressionPoints[info.indexFeature] - m_NeutralFacePoints[info.indexFeature]) * 1.1f;
+	distance = (expressionPoints[info.indexFeature] - m_NeutralFacePoints[info.indexFeature]);
 
 	if (info.isY)
 	{

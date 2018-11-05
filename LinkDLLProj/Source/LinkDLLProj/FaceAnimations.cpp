@@ -65,6 +65,7 @@ void AFaceAnimations::SetSmileFace(const TArray<FVector2D>& trackedSmile)
 {
 	m_SmileFacePoints = trackedSmile;
 	TranslateFaceCoordinates(m_SmileFacePoints);
+	m_LastFramePoints = m_SmileFacePoints;
 
 }
 
@@ -72,13 +73,14 @@ void AFaceAnimations::SetAngryFace(const TArray<FVector2D>& trackedAngry)
 {
 	m_AngryFacePoints = trackedAngry;
 	TranslateFaceCoordinates(m_AngryFacePoints);
+	m_LastFramePoints = m_AngryFacePoints;
 }
 
 void AFaceAnimations::SetSurprisedFace(const TArray<FVector2D>& trackedSurprised)
 {
 	m_SurprisedFacePoints = trackedSurprised;
 	TranslateFaceCoordinates(m_SurprisedFacePoints);
-
+	m_LastFramePoints = m_SurprisedFacePoints;
 }
 
 void AFaceAnimations::SetClosedEyes(const TArray<FVector2D>& trackedClosed)
@@ -129,6 +131,8 @@ void AFaceAnimations::SetMinMax()
 
 void AFaceAnimations::SetFacialExpression(const TArray<FVector2D>& currentTrackedPoints)
 {
+	
+
 	for (int i = 0; i < m_FacialFeatureArray.Num(); i++)
 	{
 		FFacialFeatureInfo info = m_FacialFeatureArray[i];
@@ -167,6 +171,7 @@ void AFaceAnimations::SetFacialExpression(const TArray<FVector2D>& currentTracke
 				SetValue(currentTrackedPoints, info);
 			}
 		}
+		
 	}
 	m_LastFramePoints = currentTrackedPoints;
 	
@@ -180,7 +185,7 @@ void AFaceAnimations::CalculateMaxDistance(const TArray<FVector2D>& expressionPo
 	//neutralTranslation = expressionPoints[m_IndexMiddleFace] - m_NeutralFacePoints[m_IndexMiddleFace]; //get the vector representing the distance between the eyebrows 
 	//info.neutralPos = m_NeutralFacePoints[info.indexFeature] + neutralTranslation;
 
-	distance = expressionPoints[info.indexFeature] - m_NeutralFacePoints[info.indexFeature];
+	distance = (expressionPoints[info.indexFeature] - m_NeutralFacePoints[info.indexFeature]) * 1.1f;
 
 	if (info.isY)
 	{
